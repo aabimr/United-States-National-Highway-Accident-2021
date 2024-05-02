@@ -1,0 +1,54 @@
+--Apa yang Harus Anda Lakukan?
+ Tujuan utama proyek ini adalah untuk membuat laporan profesional 
+interaktif dengan Google Spreadsheets, yang mana merupakan pekerjaan 
+yang sering dilakukan oleh seorang data analyst.
+ Anda akan mengerjakan proyek ini secara berkelompok (4-6 orang untuk 
+membantu the National Highway Traffic Safety Administration (NHTSA) 
+mencari solusi masalah terbesarnya, yaitu mengurangi angka kecelakaan 
+lalu lintas di Amerika Serikat.
+ Untuk menunjukkan bahwa Anda siap menjalankan tanggung jawab 
+pekerjaan yang sebenarnya, Anda akan perlu:
+ Mengorganisir workspace Anda, mengadakan pertemuan kelompok  
+ Anda sendiri, mendiskusikan tugas Anda melalui private chat di Discord, dll. 
+Format ini akan menyiapkan Anda untuk mengerjakan pekerjaan seorang 
+data analyst dan akan memberikan semua anggota kelompok kesempatan 
+untuk berkontribusi ke dalam proyek dan menunjukkan  
+ kemampuan mereka.
+
+--Tenggat Waktu
+ Kamu mendapat waktu 3 minggu untuk menyelesaikan proyek ini. Semasa 
+pengerjaan proyek, akan ada 2 live session tanya-jawab dengan mentor 
+dan community manager yang akan senantiasa membantumu. Tenggat 
+waktu proyek adalah di penghujung minggu ke-3, dan kelompokmu harus 
+mengumpulkan semua yang telah kalian kerjakan
+
+--Proyek
+ --Latar Belakang
+ Bayangkan diri Anda sebagai seorang data analyst untuk PT Refocus 
+Consultant. Refocus Consultant adalah perusahaan konsultasi yang menangani 
+berbagai analisa data seperti data bisnis, lingkungan, kesehatan, dan 
+pemerintah. Refocus Consultant juga sering diminta untuk memberikan 
+pendapat guna membantu pemerintah dalam membuat kebijakan. Refocus 
+Consultant membantu banyak klien mendapat informasi penting dari data  
+ yang disediakan oleh klien.
+ --Deskripsi Tugas
+ Anda serta tim Anda di dalam departemen data analytics mendapat 
+kesempatan yang sangat baik untuk membantu the National Highway Traffic 
+Safety Administration (NHTSA). NHTSA adalah salah satu departemen 
+pemerintah di Amerika Serikat yang fokus terhadap mengurangi angka 
+kecelakaan lalu lintas di jalan tol.
+ Saat ini NHTSA sedang menggodok regulasi baru yang akan diterapkan tahun 
+depan. Refocus Consultant adalah salah satu perusahaan yang diminta untuk 
+menganalisa data yang dikumpulkan selama tahun 2021. Data ini adalah data 
+lengkap tentang kecelakaan yang terjadi selama tahun 2021.
+ --Tujuan Analisa Data
+ Tujuan utama studi Anda adalah untuk memberikan sejumlah rekomendasi 
+tentang cara mengurangi angka kecelakaan di jalan tol. Untuk melakukan ini, 
+pertama-tama Anda perlu mengidentifikasi data berikut:
+ Kondisi yang meningkatkan risiko kecelakaan
+ 10 teratas negara bagian di mana kecelakaan paling banyak terjadi
+ Jumlah rerata kecelakaan yang terjadi setiap jam
+ Persentase kecelakaan yang disebabkan oleh pengemudi yang mabuk
+ Persentasi kecelakaan di daerah pedesaan dan perkotaan
+ Jumlah kecelakaan berdasarkan hari
+ Anda dipersilahkan menganalisa parameter lain dan membuat korelasi baru
