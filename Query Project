@@ -1,0 +1,238 @@
+--FILTERING/CLEANSING TABLE CRASH TO NEW_CRASH_2021_USA_TZ 
+
+--create table new_crash_2021_usa_tz as
+    SELECT 
+		distinct * 
+    FROM
+        (select *,
+            case
+                when consecutive_number is NULL
+                	then 'Nomor Consecutive Kosong'
+                when city_name ~~ any(array['%0%','%1%','%2%','%3%','%4%','%5%','%6%','%7%','%8%','%9%']) or city_name =' '
+                	then 'Nama Mengandung Angka'
+                when date_part('year', timestamp_of_crash_usa) > '2021' or date_part('year', timestamp_of_crash_usa) < '2021'
+                	then 'Waktu Kejadian Diluar Perhitungan'
+                else
+                	'Ok'
+             end hasil_validasi_column
+        from
+            (select *,
+             	case
+					when state_name in ('Alaska')
+						then timestamp_of_crash at time zone 'Asia/Jakarta' at time zone 'AKST'
+					when state_name in ('Alabama','Arkansas','Illinois','Iowa','Kansas','Louisiana','Minnesota','Mississippi','Missouri','Nebraska','North Dakota','Oklahoma','South Dakota','Tennessee','Texas','Wisconsin')
+						then timestamp_of_crash at time zone 'Asia/Jakarta' at time zone 'CST'
+					when state_name in ('Connecticut','Delaware','District of Columbia','Florida','Georgia','Indiana','Kentucky','Maine','Maryland','Massachusetts','Michigan','New Hampshire','New Jersey','New York','North Carolina','Ohio','Pennsylvania','Rhode Island','South Carolina','Vermont','Virginia','West Virginia')
+						then timestamp_of_crash at time zone 'Asia/Jakarta' at time zone 'EST'
+					when state_name in ('Hawaii')
+						then timestamp_of_crash at time zone 'Asia/Jakarta' at time zone 'HST'
+					when state_name in ('Arizona','Colorado','Idaho','Montana','New Mexico','Utah','Wyoming')
+						then timestamp_of_crash at time zone 'Asia/Jakarta' at time zone 'MST'
+					when state_name in ('California','Nevada','Oregon','Washington')
+						then timestamp_of_crash at time zone 'Asia/Jakarta' at time zone 'PST'
+				 end timestamp_of_crash_usa
+             from crash
+			) as timestamp_of_crash_usa
+        ) as hasil_validasi_column
+    WHERE 
+		hasil_validasi_column = 'Ok'
+    ORDER by 
+		consecutive_number
+
+	--Kecelakaan bukan diakibatkan tabrakan antar kendaraan
+SELECT
+	manner_of_collision_name,
+	count(consecutive_number) as sum_of_accident
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	manner_of_collision_name
+ORDER by
+	count(consecutive_number) desc
+
+	--Kecelakaan tidak melibatkan penumbang lain (hanya driver saja di kendaraan)
+SELECT
+	manner_of_collision_name,
+	number_of_persons_in_motor_vehicles_in_transport_mvit,
+	count(consecutive_number) as sum_accident
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	manner_of_collision_name,
+	number_of_persons_in_motor_vehicles_in_transport_mvit
+ORDER by
+	count(consecutive_number) desc
+LIMIT 5
+
+	--KECELAKAAN BERDASARKAN KECELAKAAN TUNGGAL 
+SELECT
+	manner_of_collision_name,
+	number_of_motor_vehicles_in_transport_mvit,
+	count(consecutive_number) as sum_accident_vehicles_only
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	manner_of_collision_name,
+	number_of_motor_vehicles_in_transport_mvit
+ORDER by
+	count(consecutive_number) desc
+LIMIT 5
+
+	-- kecelakaan tidak melibatkan kendaraan yang parkir berdasarkan manner
+SELECT
+	manner_of_collision_name,
+	number_of_parked_working_vehicles,
+	count(consecutive_number) as sum_accident_parked_vehicles
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	manner_of_collision_name,
+	number_of_parked_working_vehicles
+ORDER by
+	sum(consecutive_number) DESC
+LIMIT	5
+
+	-- kecelakaan tidak melibatkan kendaran dan orang lain
+SELECT
+	manner_of_collision_name,
+	number_of_forms_submitted_for_persons_not_in_motor_vehicles,
+	number_of_persons_not_in_motor_vehicles_in_transport_mvit,
+	count(consecutive_number) as sum_accident
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	manner_of_collision_name,
+	number_of_forms_submitted_for_persons_not_in_motor_vehicles,
+	number_of_persons_not_in_motor_vehicles_in_transport_mvit
+ORDER by
+	sum(consecutive_number) desc
+LIMIT 5
+
+-- Kecelakaan banyak terjadi di jalan utama / jalur cepat / dan bukan di persimpangan jalan 
+SELECT
+	type_of_intersection_name,
+	functional_system_name,
+	count(consecutive_number) as sum_accident_type_intersection_functional
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	type_of_intersection_name,
+	functional_system_name
+ORDER by
+	count(consecutive_number) desc
+LIMIT 5
+
+	--Kecelakaan banyak terjadi bukan karena Sopir mabuk, cuaca buruk dan kondisi penerangan yang buruk
+SELECT
+	light_condition_name,
+	atmospheric_conditions_1_name,
+	number_of_drunk_drivers,
+	count(consecutive_number) as sum_not_light_atmos_drunk
+FROM
+	new_crash_2021_usa_tz
+GROUP by
+	light_condition_name,
+	atmospheric_conditions_1_name,
+	number_of_drunk_drivers
+ORDER by
+	count(consecutive_number) desc	
+LIMIT 5
+
+-- TOP 10 NEGARA BAGIAN KECELAKAAN PALING BANYAK TERJADI (2)
+SELECT
+	state_name, 
+	count(consecutive_number) as summary_of_accident
+FROM
+	new_crash_2021_usa_tz
+GROUP by 
+	state_name
+ORDER by
+	summary_of_accident desc
+LIMIT 10
+
+--JUMLAH RERATA KECELAKAAN YANG TERJADI DISETIAP JAM (3)
+SELECT
+	time_accident,
+	count(time_accident)/(avg(days_a_year)) as average_hourly
+FROM
+	(
+	select
+		date_trunc('hour', timestamp_of_crash_usa :: timestamp :: time) as time_accident,
+		extract(day from (max(timestamp_of_crash_usa) over() - min(timestamp_of_crash_usa) over()))+1 as days_a_year
+	from
+		new_crash_2021_usa_tz
+	) as X
+GROUP by 
+	time_accident
+ORDER by
+	time_accident
+
+-- PERSENTASE KECELAKAAN YANG DISEBABKAN PENGEMUDI YANG MABUK DAN TIDAK (4)
+SELECT
+	drivers_status,
+	count(consecutive_number) as sum_accident,
+	count(consecutive_number) * 100.0 / (select count(consecutive_number) from new_crash_2021_usa_tz) as pst_of_drivers_status	
+FROM 
+	(
+	select
+		*,
+			case
+				when
+					number_of_drunk_drivers in ('0')
+					then
+						'No Drunk Drivers'
+						else
+							'Drunk Drivers'
+			end
+				drivers_status
+	from
+		new_crash_2021_usa_tz
+) as drivers_status
+GROUP by
+	drivers_status
+ORDER by 
+	drivers_status desc				
+					
+-- PERCENTASE KECELAKAAN URBAN DAN RURAL (5)
+SELECT 
+    land_use_name,
+	count(land_use_name) as sum_of_accidents,
+    count
+		(
+		case 
+		  	when 
+		  		land_use_name in('Rural','Urban') 
+		  		then 1 
+		end
+		) * 100.0 
+		/ 
+		(
+		select 
+		 	count(
+				case 
+				  	when land_use_name in('Rural','Urban') 
+				  		then 1 
+				end
+				 ) 
+		 from 
+		 	new_crash_2021_usa_tz
+		) 	
+		as pst_of_accidents_rural_urban
+FROM 
+    new_crash_2021_usa_tz
+WHERE
+    land_use_name in ('Rural','Urban')
+GROUP by
+    land_use_name
+
+	--JUMLAH KECELAKAAN BERDASARKAN NAMA HARI (6)
+SELECT 
+	to_char(timestamp_of_crash_usa, 'Day') as day_name,
+	count(consecutive_number) as sum_accident_by_days_name
+FROM
+	new_crash_2021_usa_tz
+GROUP by 
+	to_char(timestamp_of_crash_usa, 'Day'),
+	extract(isodow from timestamp_of_crash_usa) 
+ORDER by
+	extract(isodow from timestamp_of_crash_usa) 
